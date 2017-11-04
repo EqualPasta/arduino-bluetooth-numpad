@@ -37,7 +37,7 @@ void setAllToValue(int val) {
   digitalWrite(COL_2, val);
   digitalWrite(COL_3, val);
   digitalWrite(COL_4, val);
-  digitalWrite(COL_5, vpual);
+  digitalWrite(COL_5, val);
 }
 
 void activateOneRow(int row) {
