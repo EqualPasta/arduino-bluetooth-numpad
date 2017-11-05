@@ -1,6 +1,7 @@
 #include <Arduino.h>
 #include <Numpad.h>
 #include <SPI.h>
+#include "HID-Project.h"
 #include "Adafruit_BluefruitLE_SPI.h"
 #include "BluefruitConfig.h"
 
@@ -14,6 +15,7 @@ Adafruit_BluefruitLE_SPI ble(BLUEFRUIT_SPI_CS, BLUEFRUIT_SPI_IRQ, BLUEFRUIT_SPI_
 
 void setup() {
   Serial.begin(9600);
+  Keyboard.begin();
   setupBle();
 }
 
@@ -41,21 +43,27 @@ void prepareKeysAndSend(int nrOfPressed) {
 }
 
 void resetKeys() {
-  ble.println("AT+BLEKEYBOARDCODE=00-00");
-  ble.waitForOK();
+  if (!Serial) {
+    ble.println("AT+BLEKEYBOARDCODE=00-00");
+    ble.waitForOK();
+  }
 }
 
 void sendKeys(int keys[], int nrOfPressed) {
-  ble.print("AT+BLEKEYBOARDCODE=");
-  ble.print("00-00");
-  for (int i = 0; i < nrOfPressed; i++) {
-    ble.print("-");
-    ble.print(String(keys[i], HEX));
+  if (Serial) {
+    for (int i = 0; i < nrOfPressed; i++) {
+      Keyboard.write(KeyboardKeycode(keys[i]));
+    }
   }
-  ble.println("");
-  
-  if (!ble.waitForOK()) {
-    Serial.println("error");
+  else {
+    ble.print("AT+BLEKEYBOARDCODE=");
+    ble.print("00-00");
+    for (int i = 0; i < nrOfPressed; i++) {
+      ble.print("-");
+      ble.print(String(keys[i], HEX));
+    }
+    ble.println("");
+    ble.waitForOK();
   }
 }
 
