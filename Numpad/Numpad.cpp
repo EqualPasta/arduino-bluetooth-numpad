@@ -12,7 +12,7 @@ Numpad::Numpad(int cols[], int rows[], int colSize, int rowSize) {
   // TODO: dynamic size
   _colSize = colSize;
   _rowSize = rowSize;
-  _pressed = new char[MAX_KEYS];
+  _pressed = new int[MAX_KEYS];
   _nrPressed = 0;
   initRows();
   initCols();
@@ -74,9 +74,9 @@ void Numpad::scan() {
   }
 }
 
-char Numpad::getPressedKeys(int i) {
+int Numpad::getPressedKeys(int i) {
   if (i < _nrPressed) {
       return _pressed[i];
   }
-  return '-';
+  return 0x00;
 }
