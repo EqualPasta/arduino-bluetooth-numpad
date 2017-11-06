@@ -4,6 +4,7 @@
 #define DIGITAL_OFF 0
 #define DIGITAL_ON 1
 #define MAX_KEYS 6
+#define NO_KEY 0x00
 
 Numpad::Numpad(int cols[], int rows[], int colSize, int rowSize) {
   _cols = cols;
@@ -13,6 +14,7 @@ Numpad::Numpad(int cols[], int rows[], int colSize, int rowSize) {
   _colSize = colSize;
   _rowSize = rowSize;
   _pressed = new int[MAX_KEYS];
+  _previous = new int[MAX_KEYS];
   _nrPressed = 0;
   initRows();
   initCols();
@@ -43,6 +45,9 @@ void Numpad::activateOneCol(int col) {
 
 void Numpad::resetPressed() {
     _nrPressed = 0;
+    for (int i = 0; i< MAX_KEYS; i++) {
+      _pressed[i] = NO_KEY;
+    }
 }
 
 void Numpad::debugMatrix(int col, int row) {
@@ -52,11 +57,33 @@ void Numpad::debugMatrix(int col, int row) {
   Serial.print("\n");
 }
 
+bool Numpad::wasPressed(int key) {
+  for (int i = 0; i<MAX_KEYS; i++) {
+    if (key == _previous[i]) {
+      return true;
+    }
+  }
+  return false;
+}
+
+void Numpad::recordPrevious() {
+  for (int i = 0; i< MAX_KEYS; i++) {
+    _previous[i] = _pressed[i];
+  }
+}
+
+void Numpad::resetPrevious() {
+  for (int i = 0; i< MAX_KEYS; i++) {
+    _previous[i] = NO_KEY;
+  }
+}
+
 int Numpad::getNumberPressed() {
   return _nrPressed;
 }
 
 void Numpad::scan() {
+  recordPrevious();
   resetPressed();
 
   int i = 0;
@@ -76,7 +103,10 @@ void Numpad::scan() {
 
 int Numpad::getPressedKeys(int i) {
   if (i < _nrPressed) {
+      if (skipPrevious && wasPressed(_pressed[i])) {
+        return NO_KEY;
+      }
       return _pressed[i];
   }
-  return 0x00;
+  return NO_KEY;
 }

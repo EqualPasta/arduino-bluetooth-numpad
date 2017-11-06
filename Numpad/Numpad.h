@@ -12,7 +12,9 @@ class Numpad {
     Numpad(int cols[], int rows[], int colSize, int rowSize);
     void scan();
     int getPressedKeys(int i);
+    void resetPrevious();
     int getNumberPressed();
+    bool skipPrevious = true;
     //void overrideDefaultKeymap(int[][] keymap);
   private:
     int keymap[6][4] = {
@@ -28,6 +30,7 @@ class Numpad {
     int _colSize;
     int _rowSize;
     int* _pressed;
+    int* _previous;
     int _nrPressed;
     void debugMatrix(int col, int row);
     void setAllToValue(int val);
@@ -35,6 +38,8 @@ class Numpad {
     void initCols();
     void initRows();
     void resetPressed();
+    void recordPrevious();
+    bool wasPressed(int key);
 };
 
 #endif

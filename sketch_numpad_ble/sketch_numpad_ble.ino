@@ -20,16 +20,13 @@ void setup() {
 }
 
 void loop() {
+  //TODO: read another button to establish if bluetooth or not
   numpad.scan();
   int pressed = numpad.getNumberPressed();
   if (pressed > 0) {
     prepareKeysAndSend(pressed);
-    delay(150);
   }
-  else {
-    delay(80);
-  }
-
+  delay(70);
 }
 
 void prepareKeysAndSend(int nrOfPressed) {
@@ -39,32 +36,38 @@ void prepareKeysAndSend(int nrOfPressed) {
   }
 
   sendKeys(keys, nrOfPressed);
-  resetKeys();
-}
-
-void resetKeys() {
-  if (!Serial) {
-    ble.println("AT+BLEKEYBOARDCODE=00-00");
-    ble.waitForOK();
-  }
 }
 
 void sendKeys(int keys[], int nrOfPressed) {
   if (Serial) {
-    for (int i = 0; i < nrOfPressed; i++) {
-      Keyboard.write(KeyboardKeycode(keys[i]));
-    }
+    sendKeysUSB(keys, nrOfPressed);
   }
   else {
-    ble.print("AT+BLEKEYBOARDCODE=");
-    ble.print("00-00");
-    for (int i = 0; i < nrOfPressed; i++) {
-      ble.print("-");
-      ble.print(String(keys[i], HEX));
-    }
-    ble.println("");
-    ble.waitForOK();
+    sendKeysBLE(keys, nrOfPressed);
+    resetKeysBLE();
   }
+}
+
+void sendKeysUSB(int keys[], int nrOfPressed) {
+  for (int i = 0; i < nrOfPressed; i++) {
+    Keyboard.write(KeyboardKeycode(keys[i]));
+  }
+}
+
+void sendKeysBLE(int keys[], int nrOfPressed) {
+  ble.print("AT+BLEKEYBOARDCODE=");
+  ble.print("00-00");
+  for (int i = 0; i < nrOfPressed; i++) {
+    ble.print("-");
+    ble.print(String(keys[i], HEX));
+  }
+  ble.println("");
+  ble.waitForOK();
+}
+
+void resetKeysBLE() {
+  ble.println("AT+BLEKEYBOARDCODE=00-00");
+  ble.waitForOK();
 }
 
 void setupBle() {
@@ -83,7 +86,7 @@ void setupBle() {
   /* Enable HID Service */
   if ( ble.isVersionAtLeast(MINIMUM_FIRMWARE_VERSION) )
   {
-    if ( !ble.sendCommandCheckOK(F( "AT+BleHIDEn=1" ))) {
+    if ( !ble.sendCommandCheckOK(F( "AT+BLEHIDEn=1" ))) {
       error(F("Could not enable Keyboard"));
     }
   } else
