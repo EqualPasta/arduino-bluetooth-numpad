@@ -4,7 +4,7 @@
 #include <SPI.h>
 #include "HID-Project.h"
 
-#define CONNECTIVITY_MODE    25
+#define CONNECTIVITY_MODE    23
 #define BLUETOOTH_MODE    1
 #define USB_MODE    0
 
