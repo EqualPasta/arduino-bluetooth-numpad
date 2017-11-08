@@ -1,5 +1,7 @@
 #define VERBOSE_MODE                   true  // If set to 'true' enables debug output
 
+#define MINIMUM_FIRMWARE_VERSION    "0.6.6"
+
 // HARDWARE SPI SETTINGS
 // ----------------------------------------------------------------------------------------------
 // The following macros declare the pins to use for HW SPI communication.
